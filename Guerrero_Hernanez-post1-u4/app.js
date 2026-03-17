@@ -55,7 +55,97 @@ function agregarTarjeta() {
     // Crear el elemento DOM y añadirlo a la galería
     const elemento = crearElementoTarjeta(nuevaTarjeta);
     document.querySelector("#galeria").appendChild(elemento);
+    
+    // Actualizar el contador
+    actualizarContador();
 }
 
 // Registrar el evento del botón
 document.querySelector("#btn-agregar").addEventListener("click", agregarTarjeta);
+
+// Delegación: un solo listener en la galería para todos los botones
+galeria.addEventListener("click", (e) => {
+
+    // Verificar que el clic fue en un botón de eliminar
+    if (!e.target.matches(".btn-eliminar")) return;
+
+    const idEliminar = Number(e.target.dataset.id);
+
+    // Eliminar del estado
+    tarjetas = tarjetas.filter(t => t.id !== idEliminar);
+
+    // Eliminar del DOM
+    const elementoTarjeta = galeria.querySelector(`[data-id="${idEliminar}"]`);
+
+    if (elementoTarjeta) {
+        elementoTarjeta.remove();
+    }
+    
+    // Actualizar el contador
+    actualizarContador();
+});
+
+const btnsFiltro = document.querySelectorAll(".btn-filtro");
+
+btnsFiltro.forEach(btn => {
+    btn.addEventListener("click", () => {
+
+        // Resaltar el botón activo
+        btnsFiltro.forEach(b => b.classList.remove("activo"));
+        btn.classList.add("activo");
+
+        const categoriaFiltro = btn.dataset.categoria;
+
+        // Mostrar u ocultar cada tarjeta según la categoría
+        const todasLasTarjetas = galeria.querySelectorAll(".tarjeta");
+
+        todasLasTarjetas.forEach(tarjeta => {
+            if (categoriaFiltro === "todas") {
+                tarjeta.classList.remove("oculta");
+            } else {
+                const coincide = tarjeta.classList.contains(`categoria-${categoriaFiltro}`);
+        
+        // Actualizar el contador después de filtrar
+        actualizarContador();
+                tarjeta.classList.toggle("oculta", !coincide);
+            }
+        });
+    });
+});
+
+// Actualizar el contador de tarjetas
+function actualizarContador() {
+    const visibles = galeria.querySelectorAll(".tarjeta:not(.oculta)").length;
+
+    let contador = document.querySelector("#contador");
+
+    if (!contador) {
+        contador = document.createElement("p");
+        contador.id = "contador";
+
+        document
+            .querySelector("#filtros")
+            .insertAdjacentElement("afterend", contador);
+    }
+
+    contador.textContent = `Mostrando ${visibles} tarjeta(s)`;
+
+    // Mensaje de galería vacía
+    const sinTarjetas = galeria.querySelectorAll(".tarjeta").length === 0;
+
+    if (sinTarjetas) {
+        galeria.innerHTML = `
+            <p class="mensaje-vacio">
+                No hay tarjetas. Crea la primera usando el formulario.
+            </p>
+        `;
+    } else {
+        const msgVacio = galeria.querySelector(".mensaje-vacio");
+        if (msgVacio) {
+            msgVacio.remove();
+        }
+    }
+}
+
+// Llamar actualizarContador después de agregar o eliminar
+// (integrar en las funciones agregarTarjeta y el listener de galeria)
