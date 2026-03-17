@@ -61,6 +61,6 @@ Guerrero_Hernanez-post1-u4/
 
 ## Autor
 
-Guerrero Hernández - Post1 U4
+Guerrero Hernández Juan Pablo - Post1 U4
 
 Versión 1.0.0 - Marzo 2026
